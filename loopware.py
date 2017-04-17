@@ -110,9 +110,19 @@ def decrypt(key, fileName):
 
 			outFile.truncate(fileSize)
 
-def getKey(password):
-	hasher = SHA256.new(password.encode('utf-8'))
+def generateKey():
+	secret = bytearray(os.urandom(2048))
+	sFile = open('key.secret', 'wb')
+	sFile.write(secret)
+	sFile.close()
+	hasher = SHA256.new(secret)
+	secret = None
 	return hasher.digest()
+
+def getKey(secret):
+	with open(secret, 'rb') as sFile:
+		hasher = SHA256.new(sFile.read())
+		return hasher.digest()
 
 def parse_args():
 	"""
@@ -149,8 +159,8 @@ def parse_args():
 	if not any((args.encrypt, args.decrypt)):
 		parser.error("Required argument is missing. Use '-h' for help.")
 
-	if not args.password:
-		parser.error("Required password is missing. Use '-h' for help.")
+	if args.decrypt and not args.password:
+		parser.error("Required password file is missing. Use '-h' for help.")
 	
 	return args
 
@@ -165,9 +175,10 @@ def main():
 
 	if args.file is not None and os.path.isfile(args.file):
 		if args.encrypt:
-			encrypt(getKey(args.password), args.file)
+			encrypt(generateKey(), args.file)
 		else:
-			decrypt(getKey(args.password), args.file)
+			if os.path.isfile(args.password):
+				decrypt(getKey(args.password), args.file)
 		
 		print("%s %s" % (INFO, args.file))
 		os.remove(args.file)
@@ -175,10 +186,11 @@ def main():
 	elif args.folder is not None and os.path.isdir(args.folder):
 		if args.encrypt:
 			total = 0
+			secret = generateKey()
 			for filename in glob.iglob('%s/**' % (args.folder), recursive=True):
 				if os.path.isfile(filename):
 					print("%s %s" % (INFO, filename))
-					encrypt(getKey(args.password), filename)
+					encrypt(secret, filename)
 					os.remove(filename)
 					total += 1
 			
@@ -186,12 +198,14 @@ def main():
 
 		else:
 			total = 0
-			for filename in glob.iglob('%s/**/*.encrypted' % (args.folder), recursive=True):
-				if os.path.isfile(filename):
-					print("%s %s" % (INFO, filename))
-					decrypt(getKey(args.password), filename)
-					os.remove(filename)
-					total += 1
+			if os.path.isfile(args.password):
+				secret = getKey(args.password)
+				for filename in glob.iglob('%s/**/*.encrypted' % (args.folder), recursive=True):
+					if os.path.isfile(filename):
+						print("%s %s" % (INFO, filename))
+						decrypt(secret, filename)
+						os.remove(filename)
+						total += 1
 
 			print("\n%s Files decrypted: %d" % (INFO, total))
 	else:

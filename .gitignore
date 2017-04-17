@@ -1,4 +1,4 @@
-
+key.secret
 .DS_Store
 *.mo
 *.egg-info
@@ -13,6 +13,7 @@ eggs
 fake-eggs
 parts
 dist
+backup-files
 test-files
 .installed.cfg
 .mr.developer.cfg
