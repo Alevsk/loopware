@@ -56,12 +56,11 @@ BANNER = """
 
 EXAMPLES = """
 Examples:
-./stringTransformer.py -i [STRING]
-./stringTransformer.py -i [STRING] --exclude "hexa, octal"
-./stringTransformer.py -i [STRING] --only "hexa, octal"
-./stringTransformer.py -i [STRING] --params "rot.cipher=13,rot.encoding=utf-8"
-./stringTransformer.py --load list.txt
-./stringTransformer.py --list
+python3 loopware.py -f secret.txt --encrypt
+python3 loopware.py -f secret.txt -p key.secret --decrypt 
+python3 loopware.py -F my_secret_folder/ --encrypt --recursive
+python3 loopware.py -F my_secret_folder/ -p key.secret --decrypt --recursive
+python3 loopware.py --help
 """
 
 def encrypt(key, fileName):
@@ -132,7 +131,7 @@ def parse_args():
 	OptionParser.format_epilog = lambda self, formatter: self.epilog
 
 	parser = OptionParser(usage="usage: %prog -f secret.txt | --file secret.txt | --folder allmysecrets", epilog=EXAMPLES)
-	parser.add_option("-p", "--password", dest="password", help="set password for AES encryption/decryption")
+	parser.add_option("-p", "--password", dest="password", help="set password file for AES decryption")
 	parser.add_option("-f", "--file", dest="file", help="encrypt/decrypt this file")
 	parser.add_option("-F", "--folder", dest="folder", help="encrypt/decrypt all files in this folder")
 	parser.add_option("--encrypt", action="store_true", dest="encrypt", help="encrypt file(s)")
@@ -187,7 +186,7 @@ def main():
 		if args.encrypt:
 			total = 0
 			secret = generateKey()
-			for filename in glob.iglob('%s/**' % (args.folder), recursive=True):
+			for filename in glob.iglob('%s/**' % (args.folder), recursive=args.recursive):
 				if os.path.isfile(filename):
 					print("%s %s" % (INFO, filename))
 					encrypt(secret, filename)
@@ -200,7 +199,7 @@ def main():
 			total = 0
 			if os.path.isfile(args.password):
 				secret = getKey(args.password)
-				for filename in glob.iglob('%s/**/*.encrypted' % (args.folder), recursive=True):
+				for filename in glob.iglob('%s/**/*.encrypted' % (args.folder), recursive=args.recursive):
 					if os.path.isfile(filename):
 						print("%s %s" % (INFO, filename))
 						decrypt(secret, filename)
