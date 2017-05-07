@@ -1,0 +1,20 @@
+{
+  "name": "loopware-server",
+  "version": "1.0.0",
+  "description": "nodejs server for the loopware ransomware",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lenin Alevski <lenin@alevsk.com> (https://www.alevsk.com)",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "dependencies": {
+    "concat-stream": "^1.6.0",
+    "express": "^4.15.2",
+    "node-uuid": "^1.4.8",
+    "stream": "0.0.2"
+  }
+}

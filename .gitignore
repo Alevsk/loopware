@@ -1,4 +1,6 @@
 key.secret
+server/node_modules
+server/keys
 .DS_Store
 *.mo
 *.egg-info
