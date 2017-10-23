@@ -25,3 +25,4 @@ test-files
 *.pyc
 *.pyo
 *.tmp*
+*.swp

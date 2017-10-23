@@ -20,9 +20,20 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 app.get('/', function (req, res, next) {
+
+  let key = req.query.id || null;
+  const pattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+  if (key) {
+    if (pattern.test(key) && fs.existsSync(`keys/${key}.secret`)) {
+      console.log('secret exists');
+    } else {
+      key = null;
+    }
+  }
   res.render('index', {
     title: 'loopware',
-    uuid: uuid.v4(),
+    key: key,
   });
 });
 

